@@ -37,7 +37,9 @@ The bar: the one input at the bottom of the home screen opens apps and asks
 coding agents. Focusing it opens the list of Linux and Android apps; typing
 narrows the list, and Enter opens the highlighted app or sends the text to the
 agent. Short queries that name an app open it, sentences go to the agent; Tab
-and the arrow keys move the highlight. Tap the agent's name to pick another
+and the arrow keys move the highlight. The **search** row above **ask** sends the
+query to Android's chosen web-search app (or its chooser if no default is set),
+without requiring Linux or an agent. Tap the agent's name to pick another
 installed one; the choice is saved in `~/.config/omalauncher/agent`. Hold the mic to talk and release to send, or tap it to dictate
 into the field. Speech is recognized by Android (on the device when the phone
 supports it), so only text reaches Linux.

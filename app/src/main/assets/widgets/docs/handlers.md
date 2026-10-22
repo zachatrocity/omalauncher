@@ -56,6 +56,7 @@ after it in its block (and blocks inside them), and needs a name not used for a 
 | `latch("ctrl")` | holds `ctrl`, `alt` or `shift` for the next key, the key bar's or the keyboard's, or lets it go if it's held; `latch("ctrl", "locked")` holds it until set `off`, and `"once"` or `"off"` set it so. `android.modifiers` says how each is held (owl 12) |
 | `sound("https://…/a.mp3")` | plays a sound once, in place of the one playing; `sound("stop")` stops it. Takes a URL, an asset or a file, like `Image`; see Sounds (owl 8) |
 | `torch(true)` | turns the torch on or off; also `torch("toggle")`. Does nothing on a phone without a flash, or while the camera app holds it (owl 7) |
+| `launcher("search")` | searches the current prompt-bar query with Android's web-search handler; blank queries do nothing and a missing handler shows a message. No Linux or agent required |
 | `launcher("style")` | opens a launcher screen: `style` (theme, background, home screen, terminal; `themes` too), `agents`, `store`, `drawer`, `linux` (the sheet that installs Linux) or `settings` (owl 11 launchers; older ones ignore it) |
 | `refresh()` | re-runs this widget's sources now |
 | `screen()` / `close()` | opens the widget's `screen { }` full screen, or closes it (owl 5) |

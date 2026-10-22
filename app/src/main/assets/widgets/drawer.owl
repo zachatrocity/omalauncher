@@ -12,7 +12,7 @@ panel "app drawer" {
   state menu = ""
   state menuShortcuts = null
   state tab = "personal"
-  // The result picked with the arrow or Tab keys, -1 for the ask row; null follows the ranking.
+  // The result picked with the arrow or Tab keys, -2 for the ask row and -1 for web search; null follows the ranking.
   state pick = null
 
   // As the launcher's drawer fits them: a column for every 76 dp.
@@ -39,13 +39,13 @@ panel "app drawer" {
   let hitRows = chunk(hits, cols).map((cells, r) => {key: "q:" + r, start: r * cols, cells: cells})
   // Enter opens the best match when it names an app well, as the bar does; anything else, a prompt of more lines among it, goes to the agent.
   let opens = len(hits) > 0 && strongMatch(hits[0], typed)
-  // What Enter acts on: a result by its place in hits, or -1 for the ask row.
-  let chosen = pick ?? (opens ? 0 : -1)
+  // What Enter acts on: a result by its place in hits, or -2 for the ask row and -1 for web search.
+  let chosen = pick ?? (opens ? 0 : -2)
   let agent = ag.default
   // With a keyboard: Up and Tab move the pick away from the bar, Down and Shift+Tab back; the ask row sits lowest.
   onKey: {
     if searching {
-      pick = clamp(chosen + (value == "up" || value == "tab" ? 1 : -1), -1, len(hits) - 1)
+      pick = clamp(chosen + (value == "up" || value == "tab" ? 1 : -1), -2, len(hits) - 1)
     }
   }
   let labels = {pin: "add to home", info: "app info", uninstall: "uninstall", remove: "remove", edit: "edit", share: "share"}
@@ -53,12 +53,14 @@ panel "app drawer" {
   // Typing starts the pick over, at the best match.
   on typed { pick = null }
 
-  enter: searching ? (chosen >= 0 ? "▸ open" : "⏎ ask") : ""
+  enter: searching ? (chosen >= 0 ? "▸ open" : chosen == -1 ? "⏎ search" : "⏎ ask") : ""
   // An empty bar's Enter does nothing, as on home.
   onSubmit: {
     if searching {
       if chosen >= 0 {
         open(hits[chosen].key)
+      } else if chosen == -1 {
+        launcher("search")
       } else if !linux {
         launcher("linux")
       } else {
@@ -198,13 +200,31 @@ panel "app drawer" {
         }
       }
     }
-    // The one line above the bar that sends what's typed to the agent; outlined when that's what Enter does.
+    // Android chooses the web-search provider; this works without Linux or an agent.
     Row {
       visible: searching
       fill: width
       gap: 4
       padding: [12, 10]
       border: chosen == -1 ? 2 : 0
+      borderColor: accent
+      radius: 16 * corners
+      onTap: launcher("search")
+      Text { text: "⏎"; color: chosen == -1 ? accent : muted }
+      Text {
+        text: "search " + typed
+        color: chosen == -1 ? foreground : muted
+        maxLines: 1
+        weight: 1
+      }
+    }
+    // The one line above the bar that sends what's typed to the agent; outlined when that's what Enter does.
+    Row {
+      visible: searching
+      fill: width
+      gap: 4
+      padding: [12, 10]
+      border: chosen == -2 ? 2 : 0
       borderColor: accent
       radius: 16 * corners
       onTap: {
@@ -216,10 +236,10 @@ panel "app drawer" {
           ask(typed)
         }
       }
-      Text { text: "⏎"; color: chosen == -1 ? accent : muted }
+      Text { text: "⏎"; color: chosen == -2 ? accent : muted }
       Text {
         text: !linux ? "ask an agent · install linux" : agent == null ? "ask an agent · install one" : "ask " + agent.bin + ": " + typed
-        color: chosen == -1 ? foreground : muted
+        color: chosen == -2 ? foreground : muted
         maxLines: 1
         weight: 1
       }

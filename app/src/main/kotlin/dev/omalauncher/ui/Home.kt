@@ -5,6 +5,9 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableIntStateOf
 import android.app.WallpaperManager
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
+import dev.omalauncher.searchWeb
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.rememberUpdatedState
@@ -80,6 +83,7 @@ fun HomeScreen(
     state: LauncherState,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
     val engine = runtime.widgets
     val linuxState by runtime.bootstrap.state.collectAsState()
     val arrange = remember { Arrange() }
@@ -131,6 +135,14 @@ fun HomeScreen(
                 "store" -> state.show(SettingsPage.Store)
                 "linux" -> state.show(SettingsPage.Linux)
                 "drawer" -> state.open()
+                "search" -> if (state.query.isNotBlank()) {
+                    if (context.searchWeb(state.query)) {
+                        state.query = ""
+                        state.closeNow()
+                    } else {
+                        Toast.makeText(context, "no app handles web searches", Toast.LENGTH_SHORT).show()
+                    }
+                }
                 "settings" -> state.show()
             }
         }
